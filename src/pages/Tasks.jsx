@@ -4,7 +4,7 @@ import TaskCard from '../components/tasks/TaskCard';
 
 const Tasks = () => {
   return (
-    <div className="h-screen grid grid-cols-12">
+    <div className="grid grid-cols-12">
       <div className="col-span-9 px-10 pt-10">
         <div className="flex justify-between items-center">
           <div>
