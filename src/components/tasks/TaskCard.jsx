@@ -18,6 +18,10 @@ const TaskCard = ({ task }) => {
     updatedStatus = "archive";
   }
   console.log(updatedStatus);
+  const handleRemove = (e) =>{
+    e.preventDefault();
+    dispatch(removeTask(task?.id))
+  }
   const handleUpdateStatus = (e)=>{
     e.preventDefault();
     dispatch(updateStatus({ id: task.id, status: updatedStatus }))
@@ -41,7 +45,7 @@ const TaskCard = ({ task }) => {
             <p>{task?.date}</p>
             <div className="flex gap-3">
               <button
-                onClick={() => dispatch(removeTask(task?.id))}
+                onClick={handleRemove}
                 title="Delete"
               >
                 <TrashIcon className="h-5 w-5 text-red-500" />

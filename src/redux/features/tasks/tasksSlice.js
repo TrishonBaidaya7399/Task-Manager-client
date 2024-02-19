@@ -16,8 +16,9 @@ export const tasksSlice = createSlice({
             state.tasks.push({id: lastElement.id + 1, status: "pending", ...action.payload})
         }
     },
-    removeTask: (state,action)=>{
-        state.tasks.filter((task)=> task.id !== action.payload)
+    removeTask: (state, action)=>{
+        const remainingTasks = state.tasks.filter((task)=> task.id !== action.payload)
+        state.tasks = remainingTasks
     },
     updateStatus: (state, action)=>{
         console.log(action.payload);
