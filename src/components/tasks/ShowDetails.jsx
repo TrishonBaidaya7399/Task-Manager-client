@@ -12,13 +12,9 @@ const ShowDetails = ({ isOpen, setIsOpen, task }) => {
         <div key={task.id} className="rounded-md p-5">
           {/* <button onClick={onCancel} className="cursor text-end text-red-500 text-xl fixed top-2 right-2"><RxCross2 /></button> */}
           <h1>
-            Priority:
+            Priority: 
             <span
-              className={`text-lg font-semibold mb-3  ${
-                task.priority === "high" ? "text-red-500" : ""
-              } ${task.priority === "medium" ? "text-yellow-500" : ""} ${
-                task.priority === "low" ? "text-green-500" : ""
-              }`}
+              className="uppercase"
             >
               {task?.priority}
             </span>
