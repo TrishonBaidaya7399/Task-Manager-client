@@ -9,8 +9,8 @@ import ShowDetails from "./showDetails";
 
 const TaskCard = ({ task }) => {
   let [isOpen, setIsOpen] = useState(false);
-  console.log(task);
-  console.log(task.status);
+  // console.log(task);
+  // console.log(task.status);
   const dispatch = useDispatch();
   let updatedStatus;
   if (task.status === "pending") {
@@ -20,7 +20,7 @@ const TaskCard = ({ task }) => {
   } else {
     updatedStatus = "archive";
   }
-  console.log(updatedStatus);
+  // console.log(updatedStatus);
   const handleRemove = (e) => {
     e.preventDefault();
     dispatch(removeTask(task?.id));

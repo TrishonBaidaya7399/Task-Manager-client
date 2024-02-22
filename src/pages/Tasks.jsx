@@ -1,10 +1,9 @@
 import { BellIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import MyTasks from "../components/tasks/MyTasks";
 import TaskCard from "../components/tasks/TaskCard";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import AddTaskModal from "../components/tasks/AddTaskModal";
-import { useDispatch, useSelector } from "react-redux";
-import { addTasks } from "../redux/features/users/usersSlice";
+import { useSelector } from "react-redux";
 
 const Tasks = () => {
   let [isOpen, setIsOpen] = useState(false);
@@ -12,14 +11,7 @@ const Tasks = () => {
   const pendingTasks = tasks.filter((task) => task.status === "pending");
   const runningTasks = tasks.filter((task) => task.status === "running");
   const completedTasks = tasks.filter((task) => task.status === "done");
- const dispatch = useDispatch()
-  // const archiveTasks = tasks.filter((task)=> task.status === "archive")
-  const loggedInUser = "Trishon Baidaya";
 
-  useEffect(() => {
-    const UsersTasks = tasks.filter((item) => item.assignedTo == loggedInUser)
-    dispatch(addTasks(UsersTasks));
-  }, [tasks, dispatch]);
 
   return (
     <div className="grid grid-cols-12">

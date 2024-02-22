@@ -13,7 +13,7 @@ const initialState = {
      
     },
   ],
-  isLoading: false,
+  userSpecificTasks: [],
 };
 export const tasksSlice = createSlice({
   name: "tasksSlice",
@@ -42,8 +42,12 @@ export const tasksSlice = createSlice({
       const target = state.tasks.find((task) => task.id === action.payload.id);
       target.status = action.payload.status;
     },
+    userTasks:(state, action)=>{
+      state.userSpecificTasks = state.tasks.filter((item) => item.assignedTo === action.payload)
+      console.log("user name : ",state.userSpecificTasks);
+    }
   },
 });
 
-export const { addTask, removeTask, updateStatus } = tasksSlice.actions;
+export const { addTask, removeTask, updateStatus, userTasks } = tasksSlice.actions;
 export default tasksSlice.reducer;
