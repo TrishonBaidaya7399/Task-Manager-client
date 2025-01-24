@@ -2,8 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import Modal from "../UI/Modal";
-import { useDispatch } from "react-redux";
-import { addTask } from "../../redux/features/tasks/tasksSlice";
+import { useAddTaskMutation } from "../../redux/api/taskApi/taskApi";
+import { toast } from "react-toastify";
 
 const AddTaskModal = ({ isOpen, setIsOpen }) => {
   const {
@@ -12,18 +12,19 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
     reset,
     formState: { errors },
   } = useForm();
-
-  const dispatch = useDispatch();
-
+  const [addTask, { isLoading, error }] = useAddTaskMutation(0);
   const onSubmit = (data) => {
     console.log(data);
-    dispatch(addTask(data));
+    addTask(data);
     onCancel();
   };
 
-  const onCancel = ()=>{
-    reset()
-    setIsOpen(false)
+  const onCancel = () => {
+    reset();
+    setIsOpen(false);
+  };
+  if (error) {
+    toast.error(error);
   }
   return (
     <Modal isOpen={isOpen} setIsOpen={setIsOpen} title="Add a new task">
@@ -45,21 +46,45 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
             </p>
           )}
           <div className="flex flex-col gap-2">
-            <label htmlFor="deadLine">Dead Line</label>
+            <label htmlFor="deadLine">Start Date</label>
             <input
               className="text-black pl-2 rounded-md w-full"
-              name="deadLine"
-              id="deadLine"
+              name="startDate"
+              id="startDate"
               type="date"
-              {...register("deadLine", { required: true })}
+              {...register("startDate", { required: true })}
             />
           </div>
-          {errors.deadLine && (
+          <div className="flex flex-col gap-2">
+            <label htmlFor="endDate">End Date</label>
+            <input
+              className="text-black pl-2 rounded-md w-full"
+              name="endDate"
+              id="endDate"
+              type="date"
+              {...register("endDate", { required: true })}
+            />
+          </div>
+          {errors.endDate && (
             <p className="text-sm text-white bg-red-500 w-full py-1 px-3 rounded-full">
               * Deadline is required.
             </p>
           )}
-
+          <div className="flex flex-col gap-2">
+            <label htmlFor="status">Status</label>
+            <select
+              className="text-black pl-2 rounded-md w-full"
+              name="status"
+              id="status"
+              {...register("status", { required: true })}
+            >
+              <option defaultValue value="todo">
+                To Do
+              </option>
+              <option value="inprogress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="priority">Priority</label>
             <select
@@ -114,11 +139,23 @@ const AddTaskModal = ({ isOpen, setIsOpen }) => {
               {...register("description", { required: true })}
             />
           </div>
+          {error && (
+            <p className="text-red-500 text-md font-semibold">{error}</p>
+          )}
           <div className="flex gap-4 mx-auto pt-4">
-            <button onClick={onCancel} type="button" className="btn btn-danger">
+            <button
+              disabled={isLoading}
+              onClick={onCancel}
+              type="button"
+              className="btn btn-danger"
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
+            <button
+              disabled={isLoading}
+              type="submit"
+              className="btn btn-primary"
+            >
               Submit
             </button>
           </div>

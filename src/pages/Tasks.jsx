@@ -3,15 +3,17 @@ import MyTasks from "../components/tasks/MyTasks";
 import TaskCard from "../components/tasks/TaskCard";
 import { useState } from "react";
 import AddTaskModal from "../components/tasks/AddTaskModal";
-import { useSelector } from "react-redux";
+import { useGetTasksQuery } from "../redux/api/taskApi/taskApi";
 
 const Tasks = () => {
   let [isOpen, setIsOpen] = useState(false);
-  const { tasks } = useSelector((state) => state.tasks);
-  const pendingTasks = tasks.filter((task) => task.status === "pending");
-  const runningTasks = tasks.filter((task) => task.status === "running");
-  const completedTasks = tasks.filter((task) => task.status === "done");
-
+  // const { tasks } = useSelector((state) => state.tasks);
+  const { data: tasksData, isLoading, error } = useGetTasksQuery();
+  const allTasks = tasksData?.data;
+  const tasks = allTasks?.filter((task) => task.isDeleted === false);
+  const pendingTasks = tasks?.filter((task) => task.status === "todo");
+  const runningTasks = tasks?.filter((task) => task.status === "inprogress");
+  const completedTasks = tasks?.filter((task) => task.status === "done");
 
   return (
     <div className="grid grid-cols-12">
@@ -44,47 +46,53 @@ const Tasks = () => {
             </div>
           </div>
         </div>
-        <div className="max-h-screen overflow-auto grid grid-cols-3 gap-5 mt-10">
-          <div className="relative h-[800px] overflow-auto">
-            <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
-              <h1>Pending</h1>
-              <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
-                {pendingTasks.length}
-              </p>
+        {isLoading && !error ? (
+          <p className="text-4xl w-full h-12 text-center font-semibold">
+            Loading...
+          </p>
+        ) : (
+          <div className="max-h-screen overflow-auto grid grid-cols-3 gap-5 mt-10">
+            <div className="relative h-[800px] overflow-auto">
+              <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
+                <h1>Pending</h1>
+                <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
+                  {pendingTasks.length}
+                </p>
+              </div>
+              <div className="space-y-3">
+                {pendingTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
             </div>
-            <div className="space-y-3">
-              {pendingTasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
-              ))}
+            <div className="relative h-[800px] overflow-auto">
+              <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
+                <h1>In Progress</h1>
+                <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
+                  {runningTasks.length}
+                </p>
+              </div>
+              <div className="space-y-3">
+                {runningTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
+            </div>
+            <div className="relative h-[800px] overflow-auto">
+              <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
+                <h1>Completed</h1>
+                <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
+                  {completedTasks.length}
+                </p>
+              </div>
+              <div className="space-y-3">
+                {completedTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </div>
             </div>
           </div>
-          <div className="relative h-[800px] overflow-auto">
-            <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
-              <h1>In Progress</h1>
-              <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
-                {runningTasks.length}
-              </p>
-            </div>
-            <div className="space-y-3">
-              {runningTasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
-              ))}
-            </div>
-          </div>
-          <div className="relative h-[800px] overflow-auto">
-            <div className="flex sticky top-0 justify-between bg-[#D3DDF9] p-5 rounded-md mb-3">
-              <h1>Completed</h1>
-              <p className="bg-primary text-white w-6 h-6 grid place-content-center rounded-md">
-                {completedTasks.length}
-              </p>
-            </div>
-            <div className="space-y-3">
-              {completedTasks.map((task) => (
-                <TaskCard key={task.id} task={task} />
-              ))}
-            </div>
-          </div>
-        </div>
+        )}
       </div>
       <div className="col-span-3 border-l-2 border-secondary/20 px-10 pt-10">
         <div>

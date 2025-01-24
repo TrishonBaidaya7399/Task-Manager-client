@@ -1,34 +1,73 @@
 import { ArrowRightIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { useDispatch } from "react-redux";
-import {
-  removeTask,
-  updateStatus,
-} from "../../redux/features/tasks/tasksSlice";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ShowDetails from "./showDetails";
+import {
+  useRemoveTaskMutation,
+  useUpdateStatusMutation,
+} from "../../redux/api/taskApi/taskApi";
+import { toast } from "react-toastify";
 
 const TaskCard = ({ task }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   let [isOpen, setIsOpen] = useState(false);
-  // console.log(task);
-  // console.log(task.status);
-  const dispatch = useDispatch();
+  const [removeTask, { isLoading: isDeleting, error: removingError }] =
+    useRemoveTaskMutation();
+  const [updateStatus, { isLoading: isUpdatingStatus, error: updateError }] =
+    useUpdateStatusMutation(0);
   let updatedStatus;
-  if (task.status === "pending") {
-    updatedStatus = "running";
-  } else if (task.status === "running") {
+  useEffect(() => {
+    if (isDeleting || isUpdatingStatus) {
+      setIsLoading(true);
+    }
+  }, [isUpdatingStatus, isDeleting]);
+  useEffect(() => {
+    if (removingError) {
+      setError(removingError);
+    } else if (updateError) {
+      setError(updateError);
+    }
+  }, [removingError, updateError]);
+  if (task.status === "todo") {
+    updatedStatus = "inprogress";
+  } else if (task.status === "inprogress") {
     updatedStatus = "done";
   } else {
     updatedStatus = "archive";
   }
-  // console.log(updatedStatus);
-  const handleRemove = (e) => {
+  const handleRemove = async (e) => {
     e.preventDefault();
-    dispatch(removeTask(task?.id));
+    e.stopPropagation();
+
+    if (!task?._id) {
+      toast.error("Task ID is invalid");
+      return;
+    }
+
+    try {
+      await removeTask(task._id).unwrap();
+      toast.success("Task removed successfully");
+    } catch (error) {
+      console.error("Failed to remove task:", error);
+      toast.error(error?.data?.message || "Failed to remove task");
+    }
   };
-  const handleUpdateStatus = (e) => {
+
+  // Handle Update Status
+  const handleUpdateStatus = async (e) => {
     e.preventDefault();
-    dispatch(updateStatus({ id: task.id, status: updatedStatus }));
+    e.stopPropagation();
+    try {
+      await updateStatus({ _id: task?._id, status: updatedStatus }).unwrap();
+      toast.success("Task status updated successfully");
+    } catch (error) {
+      console.error("Failed to update status:", error);
+      toast.error(error?.message);
+    }
   };
+  if (!isDeleting && error) {
+    console.error(error);
+  }
   return (
     <>
       {task ? (
@@ -53,10 +92,20 @@ const TaskCard = ({ task }) => {
           <div className="flex justify-between mt-3">
             <p>{task?.date}</p>
             <div className="flex gap-3">
-              <button onClick={handleRemove} title="Delete">
+              <button
+                onClick={handleRemove}
+                disabled={isDeleting || isLoading}
+                title={isDeleting ? "Deleting..." : "Delete"}
+                className="cursor-pointer"
+              >
                 <TrashIcon className="h-5 w-5 text-red-500" />
               </button>
-              <button onClick={handleUpdateStatus} title="task status">
+              <button
+                onClick={handleUpdateStatus}
+                disabled={isUpdatingStatus || isLoading}
+                title={isUpdatingStatus ? "Updating..." : "task status"}
+                className="cursor-pointer"
+              >
                 <ArrowRightIcon className="h-5 w-5 text-primary" />
               </button>
             </div>
